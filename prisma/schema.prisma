@@ -1,0 +1,146 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id String @id @default(uuid())
+  nome String
+  email String
+  password String 
+  celular String
+  cpf String
+  perfil Perfil?
+  grupo grupo @default(PACIENTE)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+
+  @@map("usuarios")
+  expedientes Expediente[]
+  agendas_paciente Agenda[] @relation("PacienteAgenda")
+  agendas_medico Agenda[] @relation("MedicoAgenda")
+  prontuario_paciente Prontuario[] @relation("PacienteProntuario")
+  prontuario_medico Prontuario[] @relation("MedicoProntuario")
+}
+
+model Perfil {
+  id String @id @default(uuid())
+  usuario_id String @unique 
+  usuario Usuario @relation(fields: [usuario_id], references: [id])
+  conselho String?
+  uf_conselho String?
+  num_conselho String?
+  foto String?
+  logradouro String?
+  numero Int?
+  complemento String?
+  bairro String?
+  cidade String?
+  cep String?
+  uf String?
+
+  @@map("perfil")
+}
+
+enum grupo {
+  ADMINISTRADOR
+  ATENDENTE
+  PRESTADOR
+  PACIENTE
+}
+
+model Expediente {
+  id String @id @default(uuid())
+  prestador Usuario @relation(fields: [prestador_id], references: [id])
+  prestador_id String
+  semana String
+  dataInicio DateTime
+  dataFim DateTime
+  horarioInicio DateTime
+  horarioFim DateTime
+  horarioAlmocoInicio DateTime
+  horarioAlmocoFim DateTime
+  intervalo Int
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  @@map("expedientes")
+
+  agendas Agenda[]
+}
+
+
+model Agenda {
+  id String @id @default(uuid())
+  expediente Expediente @relation(fields: [expediente_id], references: [id])
+  expediente_id String
+  medico Usuario @relation("MedicoAgenda", fields: [medico_id], references: [id])
+  paciente Usuario? @relation("PacienteAgenda", fields: [paciente_id], references: [id])
+  medico_id String
+  paciente_id String?
+  status status? @default(LIVRE)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+
+  @@map("agendas")
+}
+
+enum status {
+  LIVRE 
+  AGENDADO 
+  CANCELADO
+  BLOQUEADO
+}
+
+model Prontuario {
+  id String @id @default(uuid())
+  medico Usuario @relation("MedicoProntuario", fields: [medico_id], references: [id])
+  paciente Usuario @relation("PacienteProntuario", fields: [paciente_id], references: [id])
+  medico_id String
+  paciente_id String
+  data DateTime
+  queixa String? @db.Text 
+  historiaMedicamentosa String? @db.Text 
+  molestiaAtual String? @db.Text 
+  alergias String? @db.Text 
+  doencaInfectoContagiosa String? @db.Text 
+  outrasInformacoes String? @db.Text 
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+
+  @@map("prontuario")
+  comparecimentos Comparecimento[]
+  atestados Atestado[]
+}
+
+model Comparecimento {
+  id String @id @default(uuid())
+  prontuario Prontuario @relation(fields: [prontuario_id], references: [id])
+  prontuario_id String
+  data DateTime
+  horaInicial DateTime
+  horaFinal DateTime
+  outrasInformacoes String? @db.Text
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+
+  @@map("comparecimentos")
+  
+}
+
+model Atestado {
+  id String @id @default(uuid())
+  prontuario Prontuario @relation(fields: [prontuario_id], references: [id])
+  prontuario_id String
+  data DateTime @default(now())
+  quantidadeDias Int
+  outrasInformacoes String? @db.Text
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+
+  @@map("atestados")
+  
+}
