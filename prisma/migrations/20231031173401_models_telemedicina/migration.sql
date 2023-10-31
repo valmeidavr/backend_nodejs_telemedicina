@@ -7,16 +7,6 @@ CREATE TABLE `usuarios` (
     `celular` VARCHAR(191) NOT NULL,
     `cpf` VARCHAR(191) NOT NULL,
     `grupo` ENUM('ADMINISTRADOR', 'ATENDENTE', 'PRESTADOR', 'PACIENTE') NOT NULL DEFAULT 'PACIENTE',
-    `created_at` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updated_at` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
-
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `perfil` (
-    `id` VARCHAR(191) NOT NULL,
-    `usuario_id` VARCHAR(191) NOT NULL,
     `conselho` VARCHAR(191) NULL,
     `uf_conselho` VARCHAR(191) NULL,
     `num_conselho` VARCHAR(191) NULL,
@@ -28,8 +18,38 @@ CREATE TABLE `perfil` (
     `cidade` VARCHAR(191) NULL,
     `cep` VARCHAR(191) NULL,
     `uf` VARCHAR(191) NULL,
+    `created_at` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
 
-    UNIQUE INDEX `perfil_usuario_id_key`(`usuario_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `unidades` (
+    `id` VARCHAR(191) NOT NULL,
+    `nome` VARCHAR(191) NOT NULL,
+    `foto` VARCHAR(191) NULL,
+    `logradouro` VARCHAR(191) NULL,
+    `numero` INTEGER NULL,
+    `complemento` VARCHAR(191) NULL,
+    `bairro` VARCHAR(191) NULL,
+    `cidade` VARCHAR(191) NULL,
+    `cep` VARCHAR(191) NULL,
+    `uf` VARCHAR(191) NULL,
+    `created_at` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `unidades_usuarios` (
+    `id` VARCHAR(191) NOT NULL,
+    `usuario_id` VARCHAR(191) NOT NULL,
+    `unidade_id` VARCHAR(191) NOT NULL,
+    `created_at` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -110,7 +130,10 @@ CREATE TABLE `atestados` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `perfil` ADD CONSTRAINT `perfil_usuario_id_fkey` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `unidades_usuarios` ADD CONSTRAINT `unidades_usuarios_usuario_id_fkey` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `unidades_usuarios` ADD CONSTRAINT `unidades_usuarios_unidade_id_fkey` FOREIGN KEY (`unidade_id`) REFERENCES `unidades`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `expedientes` ADD CONSTRAINT `expedientes_prestador_id_fkey` FOREIGN KEY (`prestador_id`) REFERENCES `usuarios`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
