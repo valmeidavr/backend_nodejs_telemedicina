@@ -14,23 +14,7 @@ model Usuario {
   password String 
   celular String
   cpf String
-  perfil Perfil?
   grupo grupo @default(PACIENTE)
-  created_at DateTime? @default(now())
-  updated_at DateTime? @default(now())
-
-  @@map("usuarios")
-  expedientes Expediente[]
-  agendas_paciente Agenda[] @relation("PacienteAgenda")
-  agendas_medico Agenda[] @relation("MedicoAgenda")
-  prontuario_paciente Prontuario[] @relation("PacienteProntuario")
-  prontuario_medico Prontuario[] @relation("MedicoProntuario")
-}
-
-model Perfil {
-  id String @id @default(uuid())
-  usuario_id String @unique 
-  usuario Usuario @relation(fields: [usuario_id], references: [id])
   conselho String?
   uf_conselho String?
   num_conselho String?
@@ -42,8 +26,16 @@ model Perfil {
   cidade String?
   cep String?
   uf String?
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
 
-  @@map("perfil")
+  @@map("usuarios")
+  expedientes Expediente[]
+  unidades_usuarios UnidadesUsuarios[]
+  agendas_paciente Agenda[] @relation("PacienteAgenda")
+  agendas_medico Agenda[] @relation("MedicoAgenda")
+  prontuario_paciente Prontuario[] @relation("PacienteProntuario")
+  prontuario_medico Prontuario[] @relation("MedicoProntuario")
 }
 
 enum grupo {
@@ -51,6 +43,36 @@ enum grupo {
   ATENDENTE
   PRESTADOR
   PACIENTE
+}
+
+model Unidades {
+  id String @id @default(uuid())
+  nome String
+  foto String?
+  logradouro String?
+  numero Int?
+  complemento String?
+  bairro String?
+  cidade String?
+  cep String?
+  uf String?
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  @@map("unidades")
+  unidadesUsuarios UnidadesUsuarios[]
+}
+
+model UnidadesUsuarios {
+  id String @id @default(uuid())
+  usuario Usuario @relation(fields: [usuario_id], references: [id])
+  usuario_id String
+  unidade Unidades @relation(fields: [unidade_id], references: [id])
+  unidade_id String
+
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  
+  @@map("unidades_usuarios")
 }
 
 model Expediente {
